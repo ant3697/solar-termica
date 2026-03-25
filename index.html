@@ -63,7 +63,7 @@
         .tab.active { background: #fbbf24; color: #1a1a1c; }
 
         /* H1 actuará como zona de agarre para arrastrar */
-        h1 { margin: 0 0 10px 0; font-size: 18px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; cursor: grab; padding-bottom: 5px; }
+        h1 { margin: 0 0 10px 0; font-size: 18px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; cursor: grab; padding-bottom: 5px; display: flex; align-items: center; }
         h1:active { cursor: grabbing; }
 
         .data-row { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 5px; font-size: 13px; align-items: center; }
@@ -96,10 +96,10 @@
         }
 
         /* Abajo Izquierda */
-        #box-path { bottom: 20px; left: 20px; }
+        #box-path { bottom: 30px; left: 20px; }
 
         /* Abajo Derecha */
-        #box-polar { bottom: 20px; right: 20px; }
+        #box-polar { bottom: 30px; right: 20px; }
 
         /* Clase añadida por JS para controlar z-index al arrastrar */
         .draggable-panel { transition: z-index 0.2s; }
@@ -116,6 +116,9 @@
             left: 0; 
             width: 100%;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 12px; 
             color: #cbd5e1; 
             font-weight: bold;
@@ -125,6 +128,44 @@
             pointer-events: auto;
         }
         .map-title:active { cursor: grabbing; }
+
+        /* --- NUEVO: ESTILOS COLAPSABLES --- */
+        .collapse-toggle {
+            background: transparent; border: none; color: inherit; cursor: pointer; 
+            display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; 
+            transition: transform 0.2s; outline: none; padding: 0;
+        }
+        .collapse-toggle:hover { color: #f8fafc; }
+        .collapsed .collapse-toggle { transform: rotate(-90deg); }
+
+        /* Ajuste Main Panel (Arriba-Izq) */
+        .panel-glass.collapsed { 
+            padding: 12px 20px; width: fit-content; min-width: auto;
+        }
+        .panel-glass.collapsed > :not(h1) { display: none !important; }
+        .panel-glass.collapsed h1 { 
+            margin: 0; padding-bottom: 0; font-size: 13px; max-width: 140px; line-height: 1.3;
+            align-items: flex-start;
+        }
+        .panel-glass.collapsed h1 .collapse-toggle { margin-top: 1px; }
+
+        /* Ajuste Paneles Mapas (Abajo) */
+        .map-box.collapsed { 
+            height: 0 !important; padding: 0 !important; 
+            border-color: transparent; background: transparent; box-shadow: none; pointer-events: none;
+        }
+        .map-box.collapsed canvas { display: none; }
+        .map-box.collapsed .map-title {
+            position: absolute; top: auto; bottom: 0;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); padding: 12px 20px;
+            pointer-events: auto; width: fit-content;
+            justify-content: flex-start; font-size: 11px; white-space: nowrap;
+        }
+        #box-path.collapsed .map-title { left: 0; right: auto; }
+        #box-polar.collapsed .map-title { left: auto; right: 0; }
+        /* ---------------------------------- */
 
         .btn-opt {
             background: #fbbf24;
@@ -272,7 +313,7 @@
             background: #1a1a1c;
             border-radius: 50%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-            cursor: pointer;
+            cursor: grab;
             z-index: 10;
             display: flex;
             align-items: center;
@@ -281,6 +322,7 @@
             pointer-events: auto;
             transition: transform 0.1s;
         }
+        #compass-rose:active { cursor: grabbing; }
         #compass-rose:hover { transform: scale(1.05); }
         .compass-arrows {
             position: absolute;
@@ -345,6 +387,15 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             padding: 10px;
+        }
+
+        /* Ajuste para Lil-gui cuando está colapsado */
+        .lil-gui.root.closed {
+            padding: 12px 20px;
+            width: fit-content !important;
+        }
+        .lil-gui.root.closed > .title {
+            margin: 0; padding: 0; border: none;
         }
 
         /* Título de la caja principal ("Parámetros Técnicos") */
@@ -420,57 +471,41 @@
             cursor: pointer;
             opacity: 0;
         }
-
-        /* --- NUEVO: Estilos para paneles colapsables --- */
-        .collapse-btn {
-            position: absolute; left: 0px; top: 50%; transform: translateY(-50%);
-            background: transparent; border: none; color: inherit; cursor: pointer;
-            font-size: 10px; pointer-events: auto; transition: transform 0.2s, color 0.2s; padding: 4px;
-            outline: none;
-        }
-        .collapse-btn:hover { color: #fbbf24; }
-        .collapsed .collapse-btn { transform: translateY(-50%) rotate(-90deg); }
-        
-        .panel-glass h1 { position: relative; padding-left: 20px; transition: margin 0.2s, padding 0.2s; }
-        .panel-glass.collapsed { width: max-content; }
-        .panel-glass.collapsed h1 { margin-bottom: 0; padding-bottom: 0; }
-        .panel-glass.collapsed .panel-body { display: none; }
-        
-        .map-title { box-sizing: border-box; padding-left: 20px; padding-right: 20px; transition: all 0.2s; }
-        .map-box.collapsed { height: auto !important; width: max-content !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; }
-        .map-box.collapsed canvas { display: none; }
-        .map-box.collapsed .map-title {
-            position: relative;
-            top: 0;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px;
-            padding: 8px 15px 8px 25px; text-shadow: none; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            color: #f8fafc;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
 
 <div id="ui-container">
     <div class="panel-glass collapsed">
-        <h1><button class="collapse-btn">▼</button> Análisis Solar Integral</h1>
-        <div class="panel-body">
-            <p id="ui-location-text" style="font-size: 11px; opacity: 0.7; margin-top: -5px;">Málaga, ES (36.72°N, 4.42°W)</p>
-            
-            <!-- PESTAÑAS (Mismo estilo que Shadowmap) -->
-            <div class="ui-tabs">
-                <div class="tab active" id="tab-btn-vis">👁️ Visualizar</div>
-                <div class="tab" id="tab-btn-ana">📊 Analizar</div>
+        <h1><button class="collapse-toggle" title="Colapsar/Expandir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>Análisis Solar Integral</h1>
+        <p id="ui-location-text" style="font-size: 11px; opacity: 0.7; margin-top: -5px;">Málaga, ES (36.72°N, 4.42°W)</p>
+        
+        <!-- PESTAÑAS (Mismo estilo que Shadowmap) -->
+        <div class="ui-tabs">
+            <div class="tab active" id="tab-btn-vis">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Visualizar
             </div>
+            <div class="tab" id="tab-btn-ana">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                Analizar
+            </div>
+        </div>
 
-            <!-- CONTENIDO: VISUALIZAR -->
-            <div id="view-visualize">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button id="btn-play-pause" title="Reproducir/Pausar Animación" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #f8fafc; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; padding-left: 2px;">▶</button>
-                        <div id="ui-big-time" style="font-size: 24px; font-weight: 800; color: #fbbf24; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(251,191,36,0.3);">09:00</div>
+        <!-- CONTENIDO: VISUALIZAR -->
+        <div id="view-visualize">
+            <!-- Panel de Control de Tiempo visual con selector de calendario -->
+            <div class="time-control-panel" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <div style="display:flex; align-items: baseline; gap: 8px;">
+                        <!-- Botón Play/Pausa -->
+                        <button id="btn-play-pause" title="Reproducir/Pausar Animación" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; padding: 0; font-size: 11px; padding-left: 2px;">
+                            ▶
+                        </button>
+                        <span id="ui-big-time" style="font-size: 22px; font-weight: 800; color: #fbbf24; letter-spacing: -0.5px;">12:00</span>
+                        <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">UTC+1</span>
                     </div>
+                    <!-- Calendario interactivo con mejor visualización y clic infalible -->
                     <div style="position: relative; display: inline-block;">
                         <div id="ui-big-date" title="Haz clic para seleccionar un día" style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 5px;">
                             <span>01/01/2026</span> <span style="font-size: 13px;">📅</span>
@@ -479,6 +514,7 @@
                     </div>
                 </div>
                 
+                <!-- Etiquetas de datos añadidas -->
                 <span style="font-size: 9px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Hora Solar</span>
                 <input type="range" id="slider-hora" class="custom-slider" min="0" max="24" step="0.05" value="9">
                 <div style="display: flex; justify-content: space-between; font-size: 10px; color: #cbd5e1; margin-bottom: 8px; font-weight: 600;">
@@ -488,53 +524,54 @@
                 
                 <span style="font-size: 9px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Día del año</span>
                 <input type="range" id="slider-dia" class="custom-slider custom-slider-thin" min="1" max="365" step="1" value="1">
-
-                <div class="data-row" style="display: none; margin-top: 15px;">
-                    <span class="label">Fecha Solar:</span>
-                    <span id="val-fecha" class="value">-</span>
-                </div>
-                <div class="data-row" style="margin-top: 15px;">
-                    <span class="label">Azimut Solar:</span>
-                    <span id="val-azi" class="value">-</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Elevación Solar:</span>
-                    <span id="val-alt" class="value">-</span>
-                </div>
-
-                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
-
-                <div class="data-row">
-                    <span class="label">Incidencia Directa:</span>
-                    <span id="val-shadow-status" class="value status-badge">-</span>
-                </div>
-
-                <div class="data-row" style="margin-top: 5px;">
-                    <span class="label">Rend. Orient/Incl:</span>
-                    <span id="val-rend" class="value highlight">-</span>
-                </div>
-
-                <div class="data-row">
-                    <span class="label">Cumplimiento CTE:</span>
-                    <span id="val-cte-check" class="value status-badge">-</span>
-                </div>
-
-                <div class="data-row" style="margin-top: 5px;">
-                    <span class="label" title="Factor de Sombras Anual según CTE">Factor Sombras (FS):</span>
-                    <span id="val-fs" class="value" style="color: #fca5a5;">-</span>
-                </div>
-                
-                <div class="data-row" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px;">
-                    <span class="label" title="Producción anual estimada (kWh por cada m² instalado)">Aporte Anual Est.:</span>
-                    <span id="val-prod-anual" class="value highlight" style="color: #6ee7b7;">-</span>
-                </div>
-                <div class="data-row">
-                    <span class="label" title="Aporte térmico estimado para el mes simulado">Aporte Mes Actual:</span>
-                    <span id="val-prod-mes" class="value" style="color: #93c5fd;">-</span>
-                </div>
-                
-                <button class="btn-opt" id="btn-optimize">Orientar al Sur (Óptimo)</button>
             </div>
+
+            <div class="data-row" style="display: none;">
+                <span class="label">Fecha Solar:</span>
+                <span id="val-fecha" class="value">-</span>
+            </div>
+            <div class="data-row">
+                <span class="label">Azimut Solar:</span>
+                <span id="val-azi" class="value">-</span>
+            </div>
+            <div class="data-row">
+                <span class="label">Elevación Solar:</span>
+                <span id="val-alt" class="value">-</span>
+            </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
+
+            <div class="data-row">
+                <span class="label">Incidencia Directa:</span>
+                <span id="val-shadow-status" class="value status-badge">-</span>
+            </div>
+
+            <div class="data-row" style="margin-top: 5px;">
+                <span class="label">Rend. Orient/Incl:</span>
+                <span id="val-rend" class="value highlight">-</span>
+            </div>
+
+            <div class="data-row">
+                <span class="label">Cumplimiento CTE:</span>
+                <span id="val-cte-check" class="value status-badge">-</span>
+            </div>
+
+            <div class="data-row" style="margin-top: 5px;">
+                <span class="label" title="Factor de Sombras Anual según CTE">Factor Sombras (FS):</span>
+                <span id="val-fs" class="value" style="color: #fca5a5;">-</span>
+            </div>
+            
+            <div class="data-row" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px;">
+                <span class="label" title="Aporte anual estimado (kWh por cada m² instalado)">Aporte Anual Est.:</span>
+                <span id="val-prod-anual" class="value highlight" style="color: #6ee7b7;">-</span>
+            </div>
+            <div class="data-row">
+                <span class="label" title="Aporte térmico estimado para el mes simulado">Aporte Mes Actual:</span>
+                <span id="val-prod-mes" class="value" style="color: #93c5fd;">-</span>
+            </div>
+            
+            <button class="btn-opt" id="btn-optimize">Orientar al Sur (Óptimo)</button>
+        </div>
 
         <!-- CONTENIDO: ANALIZAR -->
         <div id="view-analyze" style="display: none;">
@@ -632,12 +669,12 @@
 </div>
 
 <div id="box-path" class="map-box collapsed">
-    <div class="map-title"><button class="collapse-btn">▼</button> TRAYECTORIAS Y PERFIL DE OBSTÁCULOS</div>
+    <div class="map-title"><button class="collapse-toggle" title="Colapsar/Expandir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>TRAYECTORIAS Y PERFIL DE OBSTÁCULOS</div>
     <canvas id="path-canvas"></canvas>
 </div>
 
 <div id="box-polar" class="map-box collapsed">
-    <div class="map-title"><button class="collapse-btn">▼</button> MAPA DE PÉRDIDAS CTE-HE4</div>
+    <div class="map-title"><button class="collapse-toggle" title="Colapsar/Expandir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>MAPA DE PÉRDIDAS CTE-HE4</div>
     <canvas id="polar-canvas"></canvas>
 </div>
 
@@ -776,7 +813,7 @@
         controls.maxPolarAngle = Math.PI / 2 - 0.05; 
         
         controls.enableZoom = true; 
-        controls.zoomSpeed = 0.5; // Ajustado a 0.5
+        controls.zoomSpeed = 0.5; 
         controls.minDistance = 5; 
         controls.maxDistance = 150; 
         
@@ -808,17 +845,15 @@
         crearEntorno();
         crearPanel();
         crearMuroObstaculos();
-    setupCanvases();
-    setupGUI();
-    setupDraggablePanels(); 
-    setupContextMenu(); 
-    
-    const btnOpt = document.getElementById('btn-optimize');
-    if (btnOpt) btnOpt.onclick = optimizarPanel;
-    
-    window.addEventListener('resize', onResize);
+        setupCanvases();
+        setupGUI();
+        setupDraggablePanels(); 
+        setupContextMenu(); 
+        
+        document.getElementById('btn-optimize').onclick = optimizarPanel;
+        window.addEventListener('resize', onResize);
 
-    let lastMiddleClickTime = 0;
+        let lastMiddleClickTime = 0;
         renderer.domElement.addEventListener('mousedown', (e) => {
             if (e.button === 1) { 
                 const currentTime = new Date().getTime();
@@ -840,78 +875,65 @@
             });
         }
 
-        document.getElementById('compass-rose').addEventListener('click', () => {
+        document.getElementById('compass-rose').addEventListener('click', function(e) {
+            if (this.dataset.dragged === "true") { this.dataset.dragged = "false"; return; }
             const distance = controls.getDistance();
             const polar = controls.getPolarAngle();
             camera.position.set(0, Math.cos(polar) * distance, Math.sin(polar) * distance);
             controls.update();
         });
 
-        // Configurar botones de colapso de paneles
-    document.querySelectorAll('.collapse-btn').forEach(btn => {
-        btn.addEventListener('mousedown', e => e.stopPropagation());
-        btn.addEventListener('touchstart', e => e.stopPropagation(), {passive: false});
-        btn.addEventListener('click', e => {
-            const targetPanel = e.target.closest('.panel-glass') || e.target.closest('.map-box');
-            if (targetPanel) targetPanel.classList.toggle('collapsed');
+        // NUEVO: Funcionalidad para colapsar ventanas
+        document.querySelectorAll('.collapse-toggle').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const panel = e.target.closest('.panel-glass, .map-box');
+                if (panel) panel.classList.toggle('collapsed');
+            });
         });
-    });
 
-    const sliderHora = document.getElementById('slider-hora');
-    if (sliderHora) sliderHora.addEventListener('input', (e) => {
-        state.hora = parseFloat(e.target.value);
-        actualizarSimulacion();
-    });
+        document.getElementById('slider-hora').addEventListener('input', (e) => {
+            state.hora = parseFloat(e.target.value);
+            actualizarSimulacion();
+        });
+        document.getElementById('slider-dia').addEventListener('input', (e) => {
+            state.dia = parseInt(e.target.value);
+            actualizarSimulacion();
+        });
 
-    const sliderDia = document.getElementById('slider-dia');
-    if (sliderDia) sliderDia.addEventListener('input', (e) => {
-        state.dia = parseInt(e.target.value);
-        actualizarSimulacion();
-    });
+        document.getElementById('hidden-date-picker').addEventListener('change', (e) => {
+            const dateStr = e.target.value; 
+            if (!dateStr) return;
+            const dateObj = new Date(dateStr); 
+            const start = new Date(Date.UTC(dateObj.getUTCFullYear(), 0, 0));
+            const dayOfYear = Math.floor((dateObj - start) / (24 * 60 * 60 * 1000));
+            state.dia = dayOfYear;
+            actualizarSimulacion();
+        });
 
-    const hiddenDatePicker = document.getElementById('hidden-date-picker');
-    if (hiddenDatePicker) hiddenDatePicker.addEventListener('change', (e) => {
-        const dateStr = e.target.value; 
-        if (!dateStr) return;
-        const dateObj = new Date(dateStr); 
-        const start = new Date(Date.UTC(dateObj.getUTCFullYear(), 0, 0));
-        const dayOfYear = Math.floor((dateObj - start) / (24 * 60 * 60 * 1000));
-        state.dia = dayOfYear;
-        actualizarSimulacion();
-    });
+        document.getElementById('btn-play-pause').addEventListener('click', toggleAnimacion);
+        
+        document.getElementById('ui-big-date').addEventListener('click', () => {
+            const picker = document.getElementById('hidden-date-picker');
+            if (picker.showPicker) {
+                try { picker.showPicker(); } catch (error) { /* Fallback automático si falla por políticas del navegador */ }
+            }
+        });
 
-    const btnPlayPause = document.getElementById('btn-play-pause');
-    if (btnPlayPause) btnPlayPause.addEventListener('click', toggleAnimacion);
-    
-    const uiBigDate = document.getElementById('ui-big-date');
-    if (uiBigDate) uiBigDate.addEventListener('click', () => {
-        const picker = document.getElementById('hidden-date-picker');
-        if (picker && picker.showPicker) {
-            try { picker.showPicker(); } catch (error) { /* Fallback automático si falla por políticas del navegador */ }
-        }
-    });
+        document.getElementById('tab-btn-vis').addEventListener('click', () => {
+            document.getElementById('view-visualize').style.display = 'block';
+            document.getElementById('view-analyze').style.display = 'none';
+            document.getElementById('tab-btn-vis').classList.add('active');
+            document.getElementById('tab-btn-ana').classList.remove('active');
+        });
+        document.getElementById('tab-btn-ana').addEventListener('click', () => {
+            document.getElementById('view-visualize').style.display = 'none';
+            document.getElementById('view-analyze').style.display = 'block';
+            document.getElementById('tab-btn-ana').classList.add('active');
+            document.getElementById('tab-btn-vis').classList.remove('active');
+            actualizarSimulacion(); 
+        });
 
-    const tabVis = document.getElementById('tab-btn-vis');
-    const tabAna = document.getElementById('tab-btn-ana');
-    const viewVis = document.getElementById('view-visualize');
-    const viewAna = document.getElementById('view-analyze');
-
-    if (tabVis) tabVis.addEventListener('click', () => {
-        if (viewVis) viewVis.style.display = 'block';
-        if (viewAna) viewAna.style.display = 'none';
-        tabVis.classList.add('active');
-        if (tabAna) tabAna.classList.remove('active');
-    });
-
-    if (tabAna) tabAna.addEventListener('click', () => {
-        if (viewVis) viewVis.style.display = 'none';
-        if (viewAna) viewAna.style.display = 'block';
-        tabAna.classList.add('active');
-        if (tabVis) tabVis.classList.remove('active');
-        actualizarSimulacion(); 
-    });
-
-    const slInicio = document.getElementById('slider-mes-inicio');
+        const slInicio = document.getElementById('slider-mes-inicio');
         const slFin = document.getElementById('slider-mes-fin');
         const slFill = document.getElementById('ana-slider-fill');
         
@@ -985,18 +1007,20 @@
     function setupDraggablePanels() {
         function makeDraggable(el, handleSelector) {
             let initialX = 0, initialY = 0, xOffset = 0, yOffset = 0;
-            const handle = el.querySelector(handleSelector) || el;
+            const handle = handleSelector ? (el.querySelector(handleSelector) || el) : el;
             handle.addEventListener('mousedown', dragStart); handle.addEventListener('touchstart', dragStart, {passive: false});
             function dragStart(e) {
                 if(e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'input') return;
                 initialX = e.clientX || (e.touches && e.touches[0].clientX); initialY = e.clientY || (e.touches && e.touches[0].clientY);
                 document.querySelectorAll('.draggable-panel').forEach(p => p.style.zIndex = '5'); el.style.zIndex = '100';
+                el.dataset.dragged = "false";
                 document.addEventListener('mouseup', dragEnd); document.addEventListener('mousemove', elementDrag);
                 document.addEventListener('touchend', dragEnd); document.addEventListener('touchmove', elementDrag, {passive: false});
             }
             function elementDrag(e) {
                 e.preventDefault(); 
                 const currentX = e.clientX || (e.touches && e.touches[0].clientX), currentY = e.clientY || (e.touches && e.touches[0].clientY);
+                if (Math.abs(currentX - initialX) > 2 || Math.abs(currentY - initialY) > 2) el.dataset.dragged = "true";
                 xOffset += currentX - initialX; yOffset += currentY - initialY;
                 initialX = currentX; initialY = currentY;
                 el.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
@@ -1008,6 +1032,10 @@
         }
         const mainPanel = document.querySelector('.panel-glass'); mainPanel.classList.add('draggable-panel'); makeDraggable(mainPanel, 'h1');
         document.querySelectorAll('.map-box').forEach(box => { box.classList.add('draggable-panel'); makeDraggable(box, '.map-title'); });
+        
+        const compassRose = document.getElementById('compass-rose');
+        if(compassRose) { compassRose.classList.add('draggable-panel'); makeDraggable(compassRose); }
+
         setTimeout(() => {
             const guiEl = document.querySelector('.lil-gui.root');
             if(guiEl) {
@@ -1085,7 +1113,9 @@
 
         const getXYFromEvent = (e, cvs) => {
             const rect = cvs.getBoundingClientRect();
-            return { x: (e.clientX - rect.left) * (cvs.width / rect.width), y: (e.clientY - rect.top) * (cvs.height / rect.height) };
+            const cX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            const cY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+            return { x: (cX - rect.left) * (cvs.width / rect.width), y: (cY - rect.top) * (cvs.height / rect.height) };
         };
         
         const getAziAltFromXY = (x, y) => {
@@ -1096,15 +1126,18 @@
             return { x: 40 + ((azi - (-120)) / 240) * 390, y: 250 - (alt / 80) * 240 };
         };
 
-        pathCanvas.addEventListener('mousedown', (e) => {
+        const handlePathStart = (e) => {
+            if(e.type === 'touchstart') e.preventDefault();
             const evPt = getXYFromEvent(e, pathCanvas);
             
             const sunP = SunCalc.getPosition(getFechaSimulada(), state.lat, state.lon);
             const sunXY = getXYFromAziAlt(sunP.azimuth * 180 / Math.PI, sunP.altitude * 180 / Math.PI);
             
-            if (e.button === 0 && Math.hypot(evPt.x - sunXY.x, evPt.y - sunXY.y) < 15) {
-                isDraggingSun = true;
-                return; 
+            if (e.button === 0 || e.type === 'touchstart') {
+                if (Math.hypot(evPt.x - sunXY.x, evPt.y - sunXY.y) < 20) {
+                    isDraggingSun = true;
+                    return; 
+                }
             }
 
             if(state.perfilActivo !== 'Personalizado') {
@@ -1113,7 +1146,7 @@
             const data = getAziAltFromXY(evPt.x, evPt.y);
             let custom = perfilesObstaculos['Personalizado'], minDist = Infinity, targetIdx = -1;
             for(let i = 1; i < custom.length - 1; i++) {
-                if(Math.hypot(Math.abs(custom[i].a - data.a), Math.abs(custom[i].e - data.e)) < 8 && Math.hypot(Math.abs(custom[i].a - data.a), Math.abs(custom[i].e - data.e)) < minDist) { 
+                if(Math.hypot(Math.abs(custom[i].a - data.a), Math.abs(custom[i].e - data.e)) < 15 && Math.hypot(Math.abs(custom[i].a - data.a), Math.abs(custom[i].e - data.e)) < minDist) { 
                     minDist = Math.hypot(Math.abs(custom[i].a - data.a), Math.abs(custom[i].e - data.e)); targetIdx = i;
                 }
             }
@@ -1122,16 +1155,17 @@
                 if(targetIdx !== -1) { custom.splice(targetIdx, 1); crearMuroObstaculos(); actualizarSimulacion(); } else mostrarMenuContextual(e);
                 return;
             }
-            if (e.button === 0) { 
+            if (e.button === 0 || e.type === 'touchstart') { 
                 if (targetIdx !== -1) draggingPointIdx = targetIdx;
                 else {
                     let inner = custom.slice(1, -1); inner.push(data); inner.sort((p1, p2) => p1.a - p2.a); custom.splice(1, custom.length - 2, ...inner);
                     draggingPointIdx = custom.findIndex(p => p === data); crearMuroObstaculos(); actualizarSimulacion();
                 }
             }
-        });
+        };
 
-        pathCanvas.addEventListener('mousemove', (e) => {
+        const handlePathMove = (e) => {
+            if (isDraggingSun || draggingPointIdx !== -1) e.preventDefault();
             const evPt = getXYFromEvent(e, pathCanvas);
             
             const p = SunCalc.getPosition(getFechaSimulada(), state.lat, state.lon);
@@ -1164,7 +1198,12 @@
                 perfilesObstaculos['Personalizado'][draggingPointIdx].a = data.a; perfilesObstaculos['Personalizado'][draggingPointIdx].e = data.e;
                 crearMuroObstaculos(); actualizarSimulacion();
             }
-        });
+        };
+
+        pathCanvas.addEventListener('mousedown', handlePathStart);
+        pathCanvas.addEventListener('touchstart', handlePathStart, {passive: false});
+        pathCanvas.addEventListener('mousemove', handlePathMove);
+        pathCanvas.addEventListener('touchmove', handlePathMove, {passive: false});
 
         const stopDrag = () => {
             if (isDraggingSun) {
@@ -1177,14 +1216,16 @@
                 draggingPointIdx = -1; crearMuroObstaculos(); actualizarSimulacion();
             }
         };
-        pathCanvas.addEventListener('mouseup', stopDrag); pathCanvas.addEventListener('mouseleave', stopDrag);
+        pathCanvas.addEventListener('mouseup', stopDrag); 
+        pathCanvas.addEventListener('mouseleave', stopDrag);
+        pathCanvas.addEventListener('touchend', stopDrag);
         pathCanvas.addEventListener('contextmenu', e => { e.preventDefault(); if(state.perfilActivo !== 'Personalizado') mostrarMenuContextual(e); });
 
         let isDraggingPolar = false;
         const getPolarAziInclFromEvent = (e) => {
             const ev = getXYFromEvent(e, polarCanvas), cx = 150, cy = 135, maxR = 115;
             let dx = cx - ev.x, dy = ev.y - cy, r = Math.sqrt(dx*dx + dy*dy);
-            if (r > maxR + 20 && e.type === 'mousedown') return null;
+            if (r > maxR + 20 && (e.type === 'mousedown' || e.type === 'touchstart')) return null;
             if (r > maxR) { dx = (dx / r) * maxR; dy = (dy / r) * maxR; r = maxR; }
             let incl = Math.max(0, Math.min(90, (r / maxR) * 90)), azi = Math.max(-180, Math.min(180, Math.atan2(dx, dy) * 180 / Math.PI));
             return { a: azi, i: incl };
@@ -1197,8 +1238,12 @@
         };
 
         polarCanvas.addEventListener('mousedown', (e) => { if (e.button === 0) { const data = getPolarAziInclFromEvent(e); if (data) { isDraggingPolar = true; updatePolarFromEvent(e); } }});
+        polarCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); const data = getPolarAziInclFromEvent(e); if (data) { isDraggingPolar = true; updatePolarFromEvent(e); } }, {passive: false});
         polarCanvas.addEventListener('mousemove', (e) => { if (isDraggingPolar) updatePolarFromEvent(e); });
-        polarCanvas.addEventListener('mouseup', () => isDraggingPolar = false); polarCanvas.addEventListener('mouseleave', () => isDraggingPolar = false);
+        polarCanvas.addEventListener('touchmove', (e) => { if (isDraggingPolar) { e.preventDefault(); updatePolarFromEvent(e); } }, {passive: false});
+        polarCanvas.addEventListener('mouseup', () => isDraggingPolar = false); 
+        polarCanvas.addEventListener('mouseleave', () => isDraggingPolar = false);
+        polarCanvas.addEventListener('touchend', () => isDraggingPolar = false);
         polarCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); mostrarMenuContextual(e); });
     }
 
@@ -1734,6 +1779,7 @@
     let gui;
     function setupGUI() {
         gui = new GUI({ title: 'Parámetros Técnicos' });
+        gui.close(); // Inicia colapsado en la esquina superior derecha
         window.gui = gui; 
         
         // CARPETA ADAPTADA: Demanda Solar Térmica
@@ -1790,8 +1836,6 @@
         fAnim.add(state, 'velocidadAnim', 0.1, 10, 0.1).name('Velocidad (x)');
         fAnim.add(state, 'saltarNoche').name('🌙 Saltar Noche (Auto)');
         fAnim.add(state, 'congelarDia').name('🔄 Bucle un solo día'); 
-        
-        gui.close();
     }
 
     function onResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
